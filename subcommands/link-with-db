@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+source "$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")/config"
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+source "$PLUGIN_BASE_PATH/common/functions"
+source "$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")/functions"
+
+service-link-with-db-cmd() {
+    # Create a link between a grafana service and a postgresql DB so they can address to each other
+    declare SERVICE="$1" DB_NAME="$2"
+
+    # from https://stackoverflow.com/questions/48643466/docker-create-network-should-ignore-existing-network
+    NETWORK_NAME=my_local_network
+    if [ -z $(docker network ls --filter name=^${NETWORK_NAME}$ --format="{{ .Name }}") ] ; then
+         docker network create ${NETWORK_NAME} ;
+    fi
+
+    local SERVICE_NAME="$(get_service_name "$SERVICE")"
+    local DB_SERVICE_NAME="dokku.postgres.$DB_NAME"
+
+    docker network connect ${NETWORK_NAME} ${SERVICE_NAME} || true;
+    docker network connect ${NETWORK_NAME} ${DB_SERVICE_NAME} || true;
+}
+
+service-link-with-db "$@"
