@@ -17,7 +17,7 @@ Your configuration files for Grafana (`grafana.in` and datasources) should live 
 
 ```shell
 # on 0.4.x+
-sudo dokku plugin:install https://github.com/lazyatom/dokku-chrome.git chrome
+sudo dokku plugin:install https://github.com/oscareducation/dokku-grafana.git grafana
 ```
 
 ## Commands
@@ -46,19 +46,19 @@ grafana:upgrade <name>           Upgrade service <service> to the specified vers
 ## Rsage
 
 ```shell
-# Create a chrome service named lolipop
+# Create a grafana service named lolipop
 dokku grafana:create lolipop
 
 # You can also specify the image and image
 # version to use for the service
 # it *must* be compatible with the
-# official browserless/chrome image
-export GRAFANA_IMAGE="browserless/chrome"
+# official grafana/grafana image
+export GRAFANA_IMAGE="grafana/grafana"
 export GRAFANA_IMAGE_VERSION="1.6.2"
 dokku grafana:create lolipop
 
 # You can also specify custom environment
-# variables to start the chrome service
+# variables to start the grafana service
 # in semi-colon separated form
 export GRAFANA_CUSTOM_ENV="MAX_CONCURRENT_SESSIONS=10"
 dokku grafana:create lolipop
@@ -86,7 +86,7 @@ dokku grafana:enter lolipop
 # filesystem changes will not be saved to disk
 dokku grafana:enter lolipop ls -lah /
 
-# A chrome service can be linked to a
+# A grafana service can be linked to a
 # container this will use native docker
 # links via the docker-options plugin
 # here we link it to our 'playground' app
@@ -96,7 +96,7 @@ dokku grafana:link lolipop playground
 # The following environment variables will be set automatically by docker (not
 # on the app itself, so they won’t be listed when calling dokku config)
 #
-#   DOKKU_GRAFANA_LOLIPOP_NAME=/random_name/CHROME
+#   DOKKU_GRAFANA_LOLIPOP_NAME=/random_name/GRAFANA
 #   DOKKU_GRAFANA_LOLIPOP_PORT=tcp://172.17.0.1:3000
 #   DOKKU_GRAFANA_LOLIPOP_PORT_3000_TCP=tcp://172.17.0.1:3000
 #   DOKKU_GRAFANA_LOLIPOP_PORT_3000_TCP_PROTO=tcp
@@ -105,7 +105,7 @@ dokku grafana:link lolipop playground
 #
 # and the following will be set on the linked application by default
 #
-#   GRAFANA_URL=http://dokku-chrome-lolipop:3000
+#   GRAFANA_URL=http://dokku-grafana-lolipop:3000
 #
 # NOTE: the host exposed here only works internally in docker containers. If
 # you want your container to be reachable from outside, you should use `expose`.
@@ -116,7 +116,7 @@ dokku grafana:link other_service playground
 # Since GRAFANA_URL is already in use, another environment variable will be
 # generated automatically
 #
-#   DOKKU_GRAFANA_BLUE_URL=http://dokku-chrome-other-service:3000
+#   DOKKU_GRAFANA_BLUE_URL=http://dokku-grafana-other-service:3000
 
 # You can then promote the new service to be the primary one
 # NOTE: this will restart your app
@@ -126,11 +126,11 @@ dokku grafana:promote other_service playground
 # another environment variable to hold the previous value if necessary.
 # you could end up with the following for example:
 #
-#   GRAFANA_URL=http://dokku-chrome-other-service:3000
-#   DOKKU_GRAFANA_BLUE_URL=http://dokku-chrome-other-service:3000
-#   DOKKU_GRAFANA_SILVER_URL=http://dokku-chrome-lolipop:3000
+#   GRAFANA_URL=http://dokku-grafana-other-service:3000
+#   DOKKU_GRAFANA_BLUE_URL=http://dokku-grafana-other-service:3000
+#   DOKKU_GRAFANA_SILVER_URL=http://dokku-grafana-lolipop:3000
 
-# You can also unlink a chrome service
+# You can also unlink a grafana service
 # NOTE: this will restart your app and unset related environment variables
 dokku grafana:unlink lolipop playground
 
