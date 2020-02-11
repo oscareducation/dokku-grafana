@@ -46,8 +46,9 @@ service_create_container() {
   local SERVICE_ROOT="$PLUGIN_DATA_ROOT/$SERVICE"
   local SERVICE_HOST_ROOT="$PLUGIN_DATA_HOST_ROOT/$SERVICE"
   local SERVICE_NAME="$(get_service_name "$SERVICE")"
+  local DOKKU_USER_ID="$(id -u dokku)"
 
-  ID=$(docker run --name "$SERVICE_NAME" --env-file="$SERVICE_ROOT/ENV" -d --restart always --label dokku=service --label dokku.service=grafana "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION")
+  ID=$(docker run --user $DOKKU_USER_ID --name "$SERVICE_NAME" -v "$SERVICE_HOST_ROOT/data:/var/lib/grafana" -v "$SERVICE_HOST_ROOT/config:/etc/grafana" --env-file="$SERVICE_ROOT/ENV" -d --restart always --label dokku=service --label dokku.service=grafana "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION")
   echo "$ID" > "$SERVICE_ROOT/ID"
 
   dokku_log_verbose_quiet "Waiting for container to be ready"
